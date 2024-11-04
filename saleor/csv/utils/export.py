@@ -44,6 +44,7 @@ def export_products(
     ) = get_product_export_fields_and_headers_info(export_info)
 
     temporary_file = create_file_with_headers(file_headers, delimiter, file_type)
+    save_csv_file_in_export_file(export_file, temporary_file, file_name)
 
     export_products_in_batches(
         queryset,
@@ -54,8 +55,7 @@ def export_products(
         temporary_file,
         file_type,
     )
-
-    save_csv_file_in_export_file(export_file, temporary_file, file_name)
+    
     temporary_file.close()
     send_export_download_link_notification(export_file, "products")
 
