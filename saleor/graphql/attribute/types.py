@@ -421,6 +421,12 @@ class AttributeValueSelectableTypeInput(BaseInputObjectType):
             "If the passed value is non-existent, it will be created."
         ),
     )
+    name = graphene.String(
+        required=False,
+        description=(
+            "The name of an attribute to resolve. "
+        ),
+    )
 
     class Meta:
         description = (

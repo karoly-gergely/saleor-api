@@ -16,6 +16,7 @@ from django_countries.fields import Country, CountryField
 from phonenumber_field.modelfields import PhoneNumber, PhoneNumberField
 
 from ..app.models import App
+from ..core.db.fields import LongNameImageField
 from ..core.models import ModelWithExternalReference, ModelWithMetadata
 from ..core.utils.json_serializer import CustomJsonEncoder
 from ..order.models import Order
@@ -181,7 +182,7 @@ class User(
     default_billing_address = models.ForeignKey(
         Address, related_name="+", null=True, blank=True, on_delete=models.SET_NULL
     )
-    avatar = models.ImageField(upload_to="user-avatars", blank=True, null=True)
+    avatar = LongNameImageField(upload_to="user-avatars", blank=True, null=True)
     jwt_token_key = models.CharField(
         max_length=12, default=partial(get_random_string, length=12)
     )

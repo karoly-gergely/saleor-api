@@ -15,8 +15,6 @@ from graphql.error import GraphQLError
 from graphql.error import format_error as format_graphql_error
 from jwt import InvalidTokenError
 
-from ...account.models import User
-from ...app.models import App
 from ...core.exceptions import (
     CircularSubscriptionSyncEvent,
     PermissionDenied,
@@ -193,7 +191,7 @@ def format_permissions_for_display(permissions):
     return formatted_permissions
 
 
-def get_user_or_app_from_context(context: "SaleorContext") -> Union[App, User, None]:
+def get_user_or_app_from_context(context: "SaleorContext"):
     # order is important
     # app can be None but user if None then is passed as anonymous
     return context.app or context.user

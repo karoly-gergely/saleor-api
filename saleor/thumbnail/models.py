@@ -3,6 +3,7 @@ from django.db import models
 
 from ..account.models import User
 from ..app.models import App, AppInstallation
+from ..core.db.fields import LongNameImageField
 from ..product.models import Category, Collection, ProductMedia
 from . import THUMBNAIL_SIZES, ThumbnailFormat
 
@@ -16,7 +17,7 @@ def validate_thumbnail_size(size: int):
 
 
 class Thumbnail(models.Model):
-    image = models.ImageField(upload_to="thumbnails")
+    image = LongNameImageField(upload_to="thumbnails")
     size = models.PositiveIntegerField(validators=[validate_thumbnail_size])
     format = models.CharField(
         max_length=32, null=True, blank=True, choices=ThumbnailFormat.CHOICES

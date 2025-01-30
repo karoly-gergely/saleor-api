@@ -21,7 +21,7 @@ from mptt.models import MPTTModel
 from prices import Money
 
 from ..channel.models import Channel
-from ..core.db.fields import SanitizedJSONField
+from ..core.db.fields import SanitizedJSONField, LongNameImageField
 from ..core.models import (
     ModelWithExternalReference,
     ModelWithMetadata,
@@ -62,7 +62,7 @@ class Category(ModelWithMetadata, MPTTModel, SeoModel):
     parent = models.ForeignKey(
         "self", null=True, blank=True, related_name="children", on_delete=models.CASCADE
     )
-    background_image = models.ImageField(
+    background_image = LongNameImageField(
         upload_to="category-backgrounds", blank=True, null=True
     )
     background_image_alt = models.CharField(max_length=128, blank=True)
@@ -611,7 +611,7 @@ class ProductMedia(SortableModel, ModelWithMetadata):
         null=True,
         blank=True,
     )
-    image = models.ImageField(upload_to="products", blank=True, null=True)
+    image = LongNameImageField(upload_to="products", blank=True, null=True)
     alt = models.CharField(max_length=250, blank=True)
     type = models.CharField(
         max_length=32,
@@ -674,7 +674,7 @@ class Collection(SeoModel, ModelWithMetadata):
         through=CollectionProduct,
         through_fields=("collection", "product"),
     )
-    background_image = models.ImageField(
+    background_image = LongNameImageField(
         upload_to="collection-backgrounds", blank=True, null=True
     )
     background_image_alt = models.CharField(max_length=128, blank=True)

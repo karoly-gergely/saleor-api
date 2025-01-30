@@ -319,6 +319,7 @@ class AttributeAssignmentMixin:
 
     @staticmethod
     def _clean_file_url(file_url: Optional[str], error_class):
+        return file_url
         # extract storage path from file URL
         storage_root_url = get_default_storage_root_url()
         if file_url and not file_url.startswith(storage_root_url):

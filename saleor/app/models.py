@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.text import Truncator
 from oauthlib.common import generate_token
 
+from ..core.db.fields import LongNameImageField
 from ..core.models import Job, ModelWithMetadata
 from ..permission.enums import AppPermission, BasePermissionEnum
 from ..permission.models import Permission
@@ -70,7 +71,7 @@ class App(ModelWithMetadata):
     audience = models.CharField(blank=True, null=True, max_length=256)
     is_installed = models.BooleanField(default=True)
     author = models.CharField(blank=True, null=True, max_length=60)
-    brand_logo_default = models.ImageField(
+    brand_logo_default = LongNameImageField(
         upload_to="app-brand-data", blank=True, null=True
     )
     objects = AppManager()
@@ -181,7 +182,7 @@ class AppInstallation(Job):
         related_name="app_installation_set",
         related_query_name="app_installation",
     )
-    brand_logo_default = models.ImageField(
+    brand_logo_default = LongNameImageField(
         upload_to="app-installation-brand-data", blank=True, null=True
     )
 

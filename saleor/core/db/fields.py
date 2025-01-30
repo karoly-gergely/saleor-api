@@ -1,7 +1,7 @@
 import json
 from typing import Callable
 
-from django.db.models import JSONField
+from django.db.models import ImageField, JSONField
 from django.db.models.expressions import Expression
 
 
@@ -23,3 +23,9 @@ class SanitizedJSONField(JSONField):
         if isinstance(value, Expression):
             return value
         return json.dumps(self._sanitizer_method(value))
+
+
+class LongNameImageField(ImageField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('max_length', 500)
+        super().__init__(*args, **kwargs)

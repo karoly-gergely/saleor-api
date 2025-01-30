@@ -77,6 +77,11 @@ class ProductInput(BaseInputObjectType):
     external_reference = graphene.String(
         description="External ID of this product.", required=False
     )
+    product_type = graphene.ID(
+        description="ID of the type that product belongs to.",
+        name="productType",
+        required=False,
+    )
 
     class Meta:
         doc_category = DOC_CATEGORY_PRODUCTS
@@ -110,6 +115,17 @@ class ProductCreateInput(ProductInput):
         name="productType",
         required=True,
     )
+
+    class Meta:
+        doc_category = DOC_CATEGORY_PRODUCTS
+
+
+# class ProductUpdateInput(ProductInput):
+#     product_type = graphene.ID(
+#         description="ID of the type that product belongs to.",
+#         name="productType",
+#         required=False,
+#     )
 
     class Meta:
         doc_category = DOC_CATEGORY_PRODUCTS

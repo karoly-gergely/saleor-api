@@ -22,6 +22,9 @@ class ProductUpdate(ProductCreate, ModelWithExtRefMutation):
             required=False,
             description="External ID of a product to update.",
         )
+        # input = ProductUpdateInput(
+        #     required=True, description="Fields required to update a product."
+        # )
         input = ProductInput(
             required=True, description="Fields required to update a product."
         )
