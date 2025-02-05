@@ -219,4 +219,5 @@ class ProductMediaCreate(BaseMutation):
         cls.call_event(manager.product_updated, product)
         cls.call_event(manager.product_media_created, media)
         product = ChannelContext(node=product, channel_slug=None)
+        variant = ChannelContext(node=variant, channel_slug=None)
         return ProductMediaCreate(product=product, media=media, variant=variant)
