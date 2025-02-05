@@ -4,6 +4,10 @@ from typing import TYPE_CHECKING, NamedTuple, Optional
 from uuid import UUID
 
 import graphene
+import os
+import asyncio
+import aiohttp
+
 from django.core.exceptions import ValidationError
 from django.db import DatabaseError, transaction
 from django.db.utils import IntegrityError
@@ -176,3 +180,23 @@ def check_for_sorting_by_rank(info, kwargs: dict):
         kwargs["sort_by"] = product_type.create_container(
             {"direction": "-", "field": ["search_rank", "id"]}
         )
+
+
+async def fetch_file(session, url):
+    """Asynchronously downloads a file and returns its content."""
+    try:
+        async with session.get(url, timeout=10) as response:
+            response.raise_for_status()
+            content = await response.read()
+            filename = os.path.basename(url.split("?")[0])
+            return filename, content, url
+    except Exception as e:
+        print(f"Failed to download {url}: {e}")
+        return None, None
+
+
+async def download_files(file_urls):
+    """Downloads files concurrently."""
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_file(session, url) for url in file_urls]
+        return await asyncio.gather(*tasks)

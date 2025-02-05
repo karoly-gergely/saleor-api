@@ -257,7 +257,7 @@ class ProcessedIconImage(ProcessedImage):
 def get_filename_from_url(url: str) -> str:
     """Prepare a unique filename for file from the URL to avoid overwriting."""
     file_name = os.path.basename(url)
-    name, format = os.path.splitext(file_name)
+    name, format = os.path.splitext((file_name.split('?') or [''])[0])
     name = name[:FILE_NAME_MAX_LENGTH]
     hash = secrets.token_hex(nbytes=4)
-    return f"{name}_{hash}{format}"
+    return f"{name}_{hash}{format[:6]}"
