@@ -25,6 +25,16 @@ from ...types import Product, ProductMedia, ProductVariant
 from ...utils import ALT_CHAR_LIMIT, download_files
 
 
+class BaseURLMediaObjectInput(BaseInputObjectType):
+    url = graphene.String(
+        required=True, description="Represents an URL to an external media."
+    )
+    alt = graphene.String(description="Alt text for a product media.")
+
+    class Meta:
+        doc_category = DOC_CATEGORY_PRODUCTS
+
+
 class ProductMediaCreateInput(BaseInputObjectType):
     alt = graphene.String(description="Alt text for a product media.")
     image = Upload(
@@ -37,11 +47,12 @@ class ProductMediaCreateInput(BaseInputObjectType):
         required=False, description="Represents an URL to an external media."
     )
     media_urls = graphene.List(
-        graphene.String,
+        BaseURLMediaObjectInput,
         required=False,
-        description="Represents an list of URLs to external media.",
+        description="Represents an list of URLs to external media and "
+                    "Alts (optional).",
     )
-    variant_id = graphene.ID(required=False, description="ID of a product variant.")
+    variant = graphene.ID(required=False, description="ID of a product variant.")
 
     class Meta:
         doc_category = DOC_CATEGORY_PRODUCTS
@@ -49,7 +60,7 @@ class ProductMediaCreateInput(BaseInputObjectType):
 
 class ProductMediaCreate(BaseMutation):
     product = graphene.Field(Product)
-    product_variant = graphene.Field(ProductVariant)
+    variant = graphene.Field(ProductVariant)
     media = graphene.Field(ProductMedia)
 
     class Arguments:
@@ -123,7 +134,7 @@ class ProductMediaCreate(BaseMutation):
         alt = input.get("alt", "")
         media_url = input.get("media_url")
         media_urls = input.get("media_urls")
-        variant_id = input.get("variant_id")
+        variant_id = input.get("variant")
         media = None
         variant = None
         if img_data := input.get("image"):
@@ -134,7 +145,11 @@ class ProductMediaCreate(BaseMutation):
             )
         if media_urls:
             # Step 1: Download all files concurrently
-            downloaded_files = asyncio.run(download_files(media_urls))
+            downloaded_files = asyncio.run(
+                download_files(
+                    [item['url'] for item in media_urls]
+                )
+            )
 
             with transaction.atomic():
                 # Step 2: Prepare MediaFile objects
@@ -145,10 +160,11 @@ class ProductMediaCreate(BaseMutation):
                             content,
                             name=get_filename_from_url(media_url),
                         ),
-                        alt=alt,
+                        alt=media_urls[i].get('alt'),
                         type=ProductMediaTypes.IMAGE
                     )
-                    for filename, content, media_url in downloaded_files if content
+                    for i, (content, media_url) in enumerate(downloaded_files)
+                    if content
                 ]
 
                 # Step 3: Bulk insert into DB
@@ -156,7 +172,13 @@ class ProductMediaCreate(BaseMutation):
 
                 # Step 4: (Optionally) assign to a product variant
                 if variant_id:
-                    variant = models.ProductVariant.objects.get(pk=variant_id)
+                    variant = cls.get_node_or_error(
+                        info,
+                        variant_id,
+                        field="variant",
+                        only_type=ProductVariant,
+                        qs=models.ProductVariant.objects.all(),
+                    )
                     variant_media_mobjects = [
                         models.VariantMedia(
                             variant=variant,

@@ -188,8 +188,8 @@ async def fetch_file(session, url):
         async with session.get(url, timeout=10) as response:
             response.raise_for_status()
             content = await response.read()
-            filename = os.path.basename(url.split("?")[0])
-            return filename, content, url
+            # filename = os.path.basename(url.split("?")[0])
+            return content, url
     except Exception as e:
         print(f"Failed to download {url}: {e}")
         return None, None
