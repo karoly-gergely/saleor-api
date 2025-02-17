@@ -16,7 +16,7 @@ from django.db.models import (
     Subquery,
     Sum,
     Value,
-    When,
+    When, Prefetch,
 )
 from django.db.models.functions import Coalesce
 
@@ -27,6 +27,17 @@ from ..permission.utils import has_one_of_permissions
 
 
 class ProductsQueryset(models.QuerySet):
+    # def with_limited_media(self):
+        # from .models import ProductMedia
+        # """Limit media to at most 10 instances per product."""
+        # return self.prefetch_related(
+        #     Prefetch(
+        #         "media",
+        #         queryset=ProductMedia.objects.all()[:5],  # Limit media to 5
+        #         to_attr="limited_media",  # Avoid overriding the original media field
+        #     )
+        # )
+
     def published(self, channel: Channel):
         from .models import ProductChannelListing
 
@@ -255,6 +266,9 @@ class ProductsQueryset(models.QuerySet):
 
 
 ProductManager = models.Manager.from_queryset(ProductsQueryset)
+# class ProductManager(models.Manager.from_queryset(ProductsQueryset)):
+#     def get_queryset(self):
+#         return super().get_queryset().with_limited_media()
 
 
 class ProductVariantQueryset(models.QuerySet):

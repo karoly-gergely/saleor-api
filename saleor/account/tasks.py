@@ -21,7 +21,7 @@ def _prepare_redirect_url(user: User, redirect_url: str, token: str) -> str:
     return prepare_url(params, redirect_url)
 
 
-@app.task()
+@app.task
 @allow_writer()
 def trigger_send_password_reset_notification(
     redirect_url, user_pk, context_data, channel_slug
@@ -69,7 +69,7 @@ def trigger_send_password_reset_notification(
     user.save(update_fields=("last_password_reset_request",))
 
 
-@app.task()
+@app.task
 @allow_writer()
 def finish_creating_user(user_pk, redirect_url, channel_slug, context_data):
     if not user_pk:

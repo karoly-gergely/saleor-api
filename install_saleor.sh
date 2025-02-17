@@ -90,7 +90,7 @@ services:
       - ALLOWED_HOSTS=*
       - RSA_PRIVATE_KEY
       - DEBUG=True
-      - PUBLIC_URL=http://$domain_name
+      - PUBLIC_URL=https://$domain_name
       - EMAIL_URL=smtp://mailpit:1025
       - USER_EMAIL_URL=smtp://mailpit:1025
       - EMAIL_HOST=mailpit
@@ -151,9 +151,9 @@ services:
     ports:
       - "80:80"    # HTTP, for Let's Encrypt challenge
       - "443:443"  # HTTPS
-  
+
   worker:
-    image: ghcr.io/saleor/saleor:3.20
+    image: ${docker_user}/saleor-api:latest
     command: celery -A saleor --app=saleor.celeryconf:app worker --loglevel=info -B
     restart: unless-stopped
     networks:
@@ -166,7 +166,7 @@ services:
       - ALLOWED_HOSTS=*
       - RSA_PRIVATE_KEY
       - DEBUG=True
-      - PUBLIC_URL=http://$domain_name
+      - PUBLIC_URL=https://$domain_name
       - EMAIL_URL=smtp://mailpit:1025
       - USER_EMAIL_URL=smtp://mailpit:1025
       - DEFAULT_FROM_EMAIL=noreply@$domain_name
@@ -298,7 +298,7 @@ fi
 # Deploying services using Docker Compose
 echo "Deploying Saleor services..."
 show_progress 3
-echo "dckr_pat_o610SdSucjGSc0lNBOoTAXovoTg" | docker login -u kg97 --password-stdin
+echo "dckr_pat_1yPwQEIxy836J3rZCRIhEQIkjSU" | docker login -u kg97 --password-stdin
 docker-compose --project-directory . down --remove-orphans && docker-compose pull && export RSA_PRIVATE_KEY=$(cat /var/lib/saleor/my-private-key.pem) && docker-compose up -d --build
 
 # Run migrations and collect static files

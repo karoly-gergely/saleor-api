@@ -1,6 +1,7 @@
 from typing import Optional
 from urllib.parse import urlencode
 
+from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 
 from ..core.notification.utils import get_site_context
@@ -88,10 +89,35 @@ def send_account_confirmation(user, redirect_url, manager, channel_slug, token=N
         }
         return payload
 
+    def _generate_self_payload():
+        if not token:
+            user_token = default_token_generator.make_token(user)
+        else:
+            user_token = token
+
+        params = urlencode({"email": user.email, "token": user_token})
+        confirm_url = prepare_url(params, redirect_url)
+        payload = {
+            "user": get_default_user_payload(user),
+            "recipient_email": settings.DEFAULT_FROM_EMAIL,
+            "token": user_token,
+            "confirm_url": confirm_url,
+            "channel_slug": channel_slug,
+            **get_site_context(),
+        }
+        return payload
+
     handler = NotifyHandler(_generate_payload)
     manager.notify(
         NotifyEventType.ACCOUNT_CONFIRMATION,
         payload_func=handler.payload,
+        channel_slug=channel_slug,
+    )
+
+    self_handler = NotifyHandler(_generate_self_payload)
+    manager.notify(
+        NotifyEventType.ACCOUNT_CONFIRMATION,
+        payload_func=self_handler.payload,
         channel_slug=channel_slug,
     )
 

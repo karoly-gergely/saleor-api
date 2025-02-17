@@ -3,6 +3,7 @@ from collections.abc import Iterable
 from typing import Optional
 
 from django.db.models import Exists, F, OuterRef, Q
+from promise import Promise
 
 from ....core.db.connection import allow_writer_in_context
 from ....product import ProductMediaTypes
@@ -158,13 +159,18 @@ class MediaByProductIdLoader(DataLoader[int, list[ProductMedia]]):
     context_key = "media_by_product"
 
     def batch_load(self, keys):
-        media = ProductMedia.objects.using(self.database_connection_name).filter(
-            product_id__in=keys,
+        media_qs = (
+            ProductMedia.objects.using(self.database_connection_name)
+            .filter(product_id__in=keys)
+            .order_by("sort_order", "id")  # Maintain sorting order
         )
+
         media_map = defaultdict(list)
-        for media_obj in media.iterator():
-            media_map[media_obj.product_id].append(media_obj)
-        return [media_map[product_id] for product_id in keys]
+        for media_obj in media_qs.iterator():
+            if len(media_map[media_obj.product_id]) < 5:  # max 5 media on product qs
+                media_map[media_obj.product_id].append(media_obj)
+
+        return Promise.resolve([media_map[product_id] for product_id in keys])
 
 
 class ImagesByProductIdLoader(DataLoader[int, list[ProductMedia]]):

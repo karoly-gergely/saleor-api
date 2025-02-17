@@ -27,6 +27,9 @@ class AccountRegisterInput(AccountBaseInput):
     password = graphene.String(description="Password.", required=True)
     first_name = graphene.String(description="Given name.")
     last_name = graphene.String(description="Family name.")
+    is_active = graphene.Boolean(
+        description="If the user should be active", required=False
+    )
     redirect_url = graphene.String(
         description=(
             "Base of frontend URL that will be needed to create confirmation URL. "
@@ -174,7 +177,8 @@ class AccountRegister(ModelMutation):
     @classmethod
     def save_and_create_task(cls, user_exists, instance, cleaned_input, context_data):
         instance.set_password(cleaned_input["password"])
-        instance.is_confirmed = False
+        # instance.is_confirmed = False
+        instance.is_confirmed = True
 
         if not user_exists:
             instance.save()

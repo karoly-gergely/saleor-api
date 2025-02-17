@@ -173,7 +173,7 @@ class I18nMixin:
             )
 
         if address_data.get("skip_validation"):
-            cls.can_skip_address_validation(info)
+            # cls.can_skip_address_validation(info)
             format_check = False
 
         address_form = cls._validate_address_form(
