@@ -1,5 +1,6 @@
 import datetime
 import logging
+import os
 from collections.abc import Iterable
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Optional, Union, cast
@@ -1214,6 +1215,12 @@ def _post_create_order_actions(
             order_info, checkout_info.checkout.redirect_url, manager
         )
     )
+
+    # Specific per SummusClient actions
+    if os.environ.get("SUMMUS_COMPANY", "") == 'TDH':
+        from .tasks.client_specifics import thd_send_order_to_zoho
+
+        thd_send_order_to_zoho.delay(order.id)
 
 
 def _create_order_from_checkout(

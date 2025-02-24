@@ -395,6 +395,18 @@ class ProductVariant(SortableModel, ModelWithMetadata, ModelWithExternalReferenc
             else Money(price_override, channel_listing.currency)
         )
 
+    def get_base_cost(
+        self,
+        channel_listing: "ProductVariantChannelListing",
+        price_override: Optional["Decimal"] = None,
+    ) -> "Money":
+        """Return the base variant cost."""
+        return (
+            channel_listing.cost_price
+            if price_override is None
+            else Money(price_override, channel_listing.currency)
+        )
+
     def get_price(
         self,
         channel_listing: "ProductVariantChannelListing",

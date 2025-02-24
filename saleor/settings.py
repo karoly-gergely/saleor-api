@@ -661,6 +661,15 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+# if os.environ.get("SUMMUS_COMPANY", "") == 'TDH':
+#     CELERY_BEAT_SCHEDULE.update(**{
+#         "tdh-check-estimate-accepted-on-zoho": {
+#             "task": "saleor.checkout.tasks.client_specifics."
+#                     "tdh.check_estimate_accepted_and_add_zoho_payments",
+#             "schedule": datetime.timedelta(seconds=60),
+#         },
+#     })
+
 # The maximum wait time between each is_due() call on schedulers
 # It needs to be higher than the frequency of the schedulers to avoid unnecessary
 # is_due() calls
